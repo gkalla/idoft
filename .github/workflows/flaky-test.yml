@@ -1,0 +1,60 @@
+name: Flaky Test
+
+on:
+	push:
+		branches: [main]
+	workflow_dispatch:
+
+jobs:
+	normal-test:
+		runs-on: windows-latest
+		steps:
+		 - name: Checkout repo
+		   uses: actions/checkout@v3
+		
+		 - name: Setup Java
+		   uses: actions/setup-java@v3
+		   with:
+		     java-versoin: 11
+
+		 - name: Clone JSON-java
+		   shell: pwsh
+		   run: |
+			git clone https://github.com//stleary/JSON-java
+			Set-location JSON-java
+
+		 - name: Build project
+		   shell pwsh
+		   run: |
+			Set-locatoin JSON-java
+			mvn clean install -DkipTests
+
+		 - name: Run tests
+		   shell: pwsh
+		   run: |
+			Set-location: JSON-java
+			mvn -Dtest=org.json.junit.JSONObjectTest#valueToString test
+
+	nondex-test:
+		runs-on: windows_latest
+		needs: normal-test
+		steps:
+		 - name: Checkout repo
+		   uses: actions/checkout@v3
+		 
+		 - name: Setup Java
+		   uses: actions/setup-java@v3
+		   with:
+		     java_version: 11
+
+		 - name: Clone JSON-java
+		   shell: pwsh
+		   run: |
+			git clone https://github.com/stleary/Json-java
+			Set-Location JSON-java
+
+		 - name: Run nondex test
+		   shell: pwsh
+		   run: |
+			Set_Location JSOJ-java
+			mvn -Dtest=org.json.junit.JSONObjectTest#valueToString edu.illinois:nondex-maven-plugin:2.1.1:nondex
